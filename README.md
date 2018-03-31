@@ -1,28 +1,28 @@
-# Docker + jenkins + webhooks 自动部署基础实践
+# Docker + Jenkins + webhooks 自动部署基础实践
 
-- 熟悉 jenkins 的基本操作
-- 实现本地 git push 后 jenkins 自动构建部署服务
+- 熟悉 jenkins 的基本操作 ☑️
+- 实现本地 git push 后 jenkins 自动构建部署服务 ☑️
 
-此实践用于优化自己在实际工作中的工作流
+此实践用于优化自己在实际工作中的工作流:
 
 1. 在本地开发 project
 1. git push project 到 git 服务器
-1. 登录云服务器， git pull project 
+1. 登录云服务器， git pull project
 1. pm2 restart project 或者 node app.js
 
-简化流程后
+简化流程后：
 
-1. 本地开发 peoject 
+1. 本地开发 project
 1. git push
 1. 云服务器自动构建部署
 
 
-本实践将结合 docker 技术即实现云服务器处只需安装 docker 就可实现各种环境的切换与部署。
+本实践将结合 docker 技术实现对各种环境的切换与部署。
 
-基本原理： 
-> webhook 即为一个 url。 配合 Jenkins， 你的 git 服务器会在有新提交的时候请求这个 url， 而这个 url 背后对应着 Jenkins 内的构建任务， 如此便实现了自动化构建。
+基本原理：
+> webhook 即为一个 url。 配合 jenkins， 你的 git 服务器会在有新提交的时候请求这个 url， 而这个 url 背后对应着 jenkins 内的构建任务， 如此便实现了自动化构建。
 
-> 在本例中使用 docker 主要是为了确立运行环境的独立性， 这里主要是为了便于安装 Jenkins 。 当然你也可以直接 **yum install jenkins** 把他安装在云服务器上。 
+> 在本例中使用 docker 主要是为了确立运行环境的独立性， 这里主要是为了便于安装 jenkins 。 当然你也可以直接 **yum install jenkins** 把他安装在云服务器上。
 
 > 没有使用 Jenkinsfile 或 blue ocean 来部署的原因是对开启 webhook 不太友好「或许说是流程没有这样简单顺畅」。
 
@@ -40,17 +40,18 @@ Jenkins 是一个用 Java 写的开源的持续集成软件。
 
 我们依据 [Jenkins 官方的教程](https://jenkins.io/doc/tutorials/build-a-node-js-and-react-app-with-npm/) 来安装。 我安装的是集成 blue ocean 版的镜像
 
-**docker run \
+````
+  docker run \
   --rm \
   -u root \
   -d \
   -p 8080:8080 \
-  -v jenkins-data:/var/jenkins_home \ 
+  -v jenkins-data:/var/jenkins_home \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$HOME":/home \ 
+  -v "$HOME":/home \
   -v /root:/root
-
-  jenkinsci/blueocean**
+  jenkinsci/blueocean
+  ````
 
 
 后台运行并映射到服务器 8080 端口， 挂载服务器的 jenkins-data 文件夹到 jenkins 容器内， /var/run/docker.sock 用来监听 docker 的连接
@@ -77,7 +78,7 @@ Jenkins 是一个用 Java 写的开源的持续集成软件。
 
 **docker ps**
 
-找到出 jenkins／blueocean 容器的 **id** 
+找到出 jenkins／blueocean 容器的**id**
 
 **docker exec -it id sh**
 
@@ -100,7 +101,7 @@ Jenkins 是一个用 Java 写的开源的持续集成软件。
 
 ### Jenkins  部署 project
 
-首先在你的 project 内新建 Dockerfile 文件, 内容如下： 
+首先在你的 project 内新建 Dockerfile 文件, 内容如下：
 
 ````dockerfile
 # 拉取一个基本 node 运行环境的镜像，作为基础镜像
@@ -134,7 +135,7 @@ http.createServer((req, res) => {
 })
 ````
 
-ok， 设置好 project 的基本服务后， 浏览器打开 Jenkins 新建一个项目
+ok， 设置好 project 的基本服务后， 浏览器打开 jenkins 新建一个项目
 
 ![](imgs/06.jpg)
 
@@ -144,7 +145,7 @@ ok， 设置好 project 的基本服务后， 浏览器打开 Jenkins 新建一�
 
 然后设置 webhooks 的 token ， 并勾选下方的 generic webhook trigger。
 
-然后依据 generic webhook trigger 给出的提示把 **你的服务器地址：8080/job/t1/build?token=你的token** 这个hook 添加到你的 git 服务器上的 webhook 处。
+然后依据 generic webhook trigger 给出的提示把 **你的服务器地址：8080/job/t1/build?token=你的token** 这个hook 添加到你的 git 服务器上的 webhook 设置内。
 
 ![](imgs/04.jpg)
 
@@ -155,9 +156,16 @@ ok， 设置好 project 的基本服务后， 浏览器打开 Jenkins 新建一�
 
 ![](imgs/05.jpg)
 
-保存修改，在本地修改代码，并推送到 git 服务器，发现 Jenkins 开启了自动构建
+保存修改，在本地修改代码，并推送到 git 服务器，发现 Jenkins 开启了自动构建。
 
 ![](imgs/08.jpg)
+
+### 其它
+
+我的 git 服务器是 alicode 「一个 gitlab 服务， 可以放置私有 project， 当然你也可以自己搭建一个 gitlab」。
+
+如果你使用其它 git 服务流程也大同小异， 例如 github 、 bitbucket 等等。
+
 
 
 
