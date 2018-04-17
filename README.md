@@ -49,7 +49,7 @@ Jenkins 是一个用 Java 写的开源的持续集成软件。
   -v jenkins-data:/var/jenkins_home \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$HOME":/home \
-  -v /root:/root
+  -v /root:/root \
   jenkinsci/blueocean
   ````
 
