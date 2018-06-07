@@ -100,7 +100,30 @@ RUN node app.js
 
 我们说过 docker 内已经提供了各种各样的镜像，有系统镜像、软件运行镜像等。而且还有 ONBUILD 这个命令来实现镜像的重用，那么为什么要创建自己的镜像呢？我们创建自己的镜像的主要目的是依靠一些已有的底层镜像进一步满足一些定制化需求。例如把 npm 的源设置到国内、 用 volume 创建容器间的共享数据等等需求。
 
+#### 调试 container
+
+在我们运行容器的时候，有时明明 **docker run** 成功了，但使用 **docker ps** 查看运行中容器的时候发现刚才运行的容器不在列表中「即容器虽然启动成功但在运行时报错导致意外退出了」，在控制台也没有任何报错原因。 **docker ps -a** 查看所有容器, 那些运行失败的容器会列在这里，然后用 ** docker-inspect id ** 即可查看容器内的所有信息。
+
+#### 用 [docker-compose.yml](https://docs.docker.com/compose/compose-file/#build) 编排一组容器
+
+Dockerfile 用来指定单个容器，但项目常常由多个容器组合而成，例如用 nginx 容器作 web 服务器，以 mysql 容器作数据库，以 redis 容器作缓存数据库等等。 它们是一套服务容器，当然你可以对需要运行的每一个容器都 docker run 一下，但这显然不太简便易行，所以 docker-compose.yml 就是为了解决这样的问题出现，以前你写在 shell 脚本里的命令就可以全部移到这里。在这里指定各项容器参数，集中管理你所需的所有容器。在 docker-compose.yml 里每个容器被叫作 service。
+
+
+#### docker-compose 命令
+
+如果说 docker 命令「docker run、docker build、docker rm ...」 是面向单个容器的， 那么 docker-compose 「docker-compose start、docker-compose build、docker-compose rm ...」则是面向一组容器的。
+
+docker-compose 是 Docker 推出的另一款工具主要用于启动一组容器「即 docker-compose.yml 内的 services」。docker-compose 需要需要另外安装。
+
+#### 面向集群 docker stack 与 docker swarm
+
+如果说 docker run 和 docker-compose 是面向单台服务器的部署方案，那 docker stack 与 docker swarm 则是面向多台服务器的部署方案「即所谓的集群部署方案」。
+
+docker stack 类似于 docker-compose 但更强调于部署「deploy」。当然如果你不想安装 docker-compose 工具，使用 docker stack 命令也可以启动 docker-compose.yml 内的一组容器「我就是这么干的」。既然是集群方案，免不了在多台服务器上操作容器， 在 docker swarm 下，每一组运行的 docker stack 的服务器被称谓一个 node 「集群中的一个节点」。docker swarm 可以输出 ip 地址和 join-token 用于让其它服务器上的 stack 加入进来从而实现更高层次「即集群」的组合管理。
+
 
 #### Docker Swarm、Kubernetes、Mesos
+
+作为依托于 docker 技术的集群解决方案，目前主要有以下这三种选择。
 
 ![](https://cdn-images-1.medium.com/max/1600/1*M50BNQPKRomq2p76lAQnNQ.png)
