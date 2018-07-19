@@ -113,7 +113,7 @@ Dockerfile 用来指定单个容器，但项目常常由多个容器组合而成
 
 如果说 docker 命令「docker run、docker build、docker rm ...」 是面向单个容器的， 那么 docker-compose 「docker-compose start、docker-compose build、docker-compose rm ...」则是面向一组容器的。
 
-docker-compose 是 Docker 推出的另一款工具主要用于启动一组容器「即 docker-compose.yml 内的 services」。docker-compose 需要需要另外安装。
+docker-compose 是 Docker 推出的另一款工具主要用于启动一组容器「即 docker-compose.yml 内的 services」。docker-compose 需要另外安装。
 
 #### 面向集群 docker stack 与 docker swarm
 
